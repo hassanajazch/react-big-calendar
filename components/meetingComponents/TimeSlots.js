@@ -8,7 +8,7 @@ import BigCalendar from 'react-big-calendar';
 
 const localize = BigCalendar.momentLocalizer(moment);
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
-import GoogleCalendar from '../../services/GoogleCalenderService';
+import Event from '../../services/Event';
 import EventTitle from "./EventTitle";
 import uuid from 'uuid/v4';
 
@@ -24,6 +24,11 @@ class TimeSlots extends Component {
             events: [],
             slotStep: 1
         };
+    }
+
+    componentDidMount() {
+        const event = Event.getEvents();
+        console.log(event);
     }
 
     updateParent = (change) => {
