@@ -33,7 +33,7 @@ class Event {
             },
             {
                 id: 3,
-                title: 'Meeting with investors',
+                title: 'Calendar with investors',
                 start: moment().add(4, 'day').hours(3).minutes(15).toDate(),
                 end: moment().add(4, 'day').hours(5).minutes(15).toDate(),
                 oldEvent: false,

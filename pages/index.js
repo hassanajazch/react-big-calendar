@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import "../static/css/meeting-page.less";
+import "../static/css/calendar.less";
 
 function IndexPage() {
     return (

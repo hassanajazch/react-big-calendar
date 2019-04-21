@@ -9,7 +9,7 @@ import {Select} from "antd";
 import 'react-big-calendar/lib/less/styles.less';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.less';
 
-import myConstClass from '../../services/constant';
+import constants from '../../services/constant';
 import Event from '../../services/Event';
 import EventTitle from "./EventTitle";
 
@@ -17,7 +17,7 @@ const Option = Select.Option;
 const DragAndDropCalendar = withDragAndDrop(BigCalendar);
 const localize = BigCalendar.momentLocalizer(moment);
 
-class TimeSlots extends Component {
+class Calendar extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -69,7 +69,7 @@ class TimeSlots extends Component {
 
     newEvent = (event) => {
         if (moment(event.start).isBefore(moment().toDate())) {
-            alert(myConstClass.Past_DAY_ERROR);
+            alert(constants.Past_DAY_ERROR);
             return;
         }
 
@@ -103,7 +103,7 @@ class TimeSlots extends Component {
         const result = this.checkAvailability(updatedEvent);
 
         if (moment(result.start).isBefore(moment().toDate())) {
-            alert(myConstClass.Past_DAY_ERROR);
+            alert(constants.Past_DAY_ERROR);
             return;
         }
         const nextEvents = [...events];
@@ -163,17 +163,23 @@ class TimeSlots extends Component {
                 style: style
             };
         }
-    }
+    };
+
+    handleIntervalLength = (intervalValue) => {
+        this.setState({
+            slotStep: intervalValue
+        });
+    };
 
     render() {
         return (
             <NoSSR>
                 <React.Fragment>
                     <div style={{paddingTop: '10px'}}>
-                        <label>Default length: </label>
-                        <Select defaultValue={this.state.slotStep} onChange={(value) => {
-                            this.setState({slotStep: value})
-                        }} style={{width: "220px", paddingBottom: '10px'}}>
+                        <label>{constants.CALENDAR_INTERVAL_LENGTH}</label>
+                        <Select defaultValue={this.state.slotStep}
+                                onChange={(value) => this.handleIntervalLength(value)}
+                                style={{width: "220px", paddingBottom: '10px'}}>
                             <Option value="1">15 mins </Option>
                             <Option value="2">30 mins</Option>
                             <Option value="3">45 mins</Option>
@@ -196,8 +202,7 @@ class TimeSlots extends Component {
                         components={{
                             event: this.Event
                         }}
-                        eventPropGetter={TimeSlots.eventStyleGetter}
-                        selectedCalendar={this.props.selectedCalendar}
+                        eventPropGetter={Calendar.eventStyleGetter}
                     />
                 </React.Fragment>
             </NoSSR>
@@ -206,4 +211,4 @@ class TimeSlots extends Component {
 }
 
 
-export default TimeSlots
+export default Calendar
