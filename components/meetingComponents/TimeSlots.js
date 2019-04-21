@@ -1,21 +1,21 @@
-import myConstClass from '../../services/constant'
-import 'react-big-calendar/lib/less/styles.less'
-import 'react-big-calendar/lib/addons/dragAndDrop/styles.less'
-import moment from 'moment';
 import React, {Component} from 'react';
+import moment from 'moment';
 import NoSSR from 'react-no-ssr';
 import BigCalendar from 'react-big-calendar';
-
-const localize = BigCalendar.momentLocalizer(moment);
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
+import uuid from 'uuid/v4';
+import {Select} from "antd";
+
+import 'react-big-calendar/lib/less/styles.less';
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.less';
+
+import myConstClass from '../../services/constant';
 import Event from '../../services/Event';
 import EventTitle from "./EventTitle";
-import uuid from 'uuid/v4';
-
-import {Select} from "antd";
 
 const Option = Select.Option;
 const DragAndDropCalendar = withDragAndDrop(BigCalendar);
+const localize = BigCalendar.momentLocalizer(moment);
 
 class TimeSlots extends Component {
     constructor(props) {
@@ -28,40 +28,10 @@ class TimeSlots extends Component {
 
     componentDidMount() {
         const event = Event.getEvents();
-        console.log(event);
-    }
 
-    updateParent = (change) => {
-        this.props.onChange(change);
-    };
-
-    getGoogleCalendarEvents = async (selectedCalendar) => {
-        const result = await GoogleCalendar.getUserCalenderEvent(selectedCalendar);
-        if (!result.error) {
-            const events = result.data.map(event => {
-                return (
-                    {
-                        id: event.id,
-                        title: event.summary,
-                        start: new Date(event.start.dateTime),
-                        end: new Date(event.end.dateTime),
-                        oldEvent: true,
-                        slotAvailable: true
-                    }
-                )
-            });
-            this.setState({
-                events: events
-            });
-            this.updateParent(events);
-        }
-    };
-
-    async componentDidUpdate(prevProps) {
-        if (this.props.selectedCalendar !== prevProps.selectedCalendar) {
-            await this.getGoogleCalendarEvents(this.props.selectedCalendar);
-            this.props.loading();
-        }
+        this.setState({
+            events: event,
+        });
     }
 
     checkAvailability = (newEvent) => {
@@ -75,14 +45,13 @@ class TimeSlots extends Component {
 
     handleCloseClick = (eventId) => {
         const {events} = this.state;
-
         const leftOvers = events.filter(existingEvent => {
             return existingEvent.id !== eventId
         });
+
         this.setState({
             events: leftOvers,
         });
-        this.updateParent(leftOvers);
     };
 
     Event = ({event}) => {
@@ -103,6 +72,7 @@ class TimeSlots extends Component {
             alert(myConstClass.Past_DAY_ERROR);
             return;
         }
+
         let newId = uuid();
         let hour = {
             id: newId,
@@ -111,13 +81,11 @@ class TimeSlots extends Component {
             end: event.end,
             oldEvent: false,
         };
-
         const result = this.checkAvailability(hour);
 
         this.setState({
             events: this.state.events.concat([result]),
         });
-        this.updateParent(this.state.events);
     };
 
     moveEvent = ({event, start, end, isAllDay: droppedOnAllDaySlot}) => {
@@ -144,7 +112,6 @@ class TimeSlots extends Component {
         this.setState({
             events: nextEvents,
         });
-        this.updateParent(nextEvents);
     };
 
     resizeEvent = ({event, start, end}) => {
@@ -158,8 +125,6 @@ class TimeSlots extends Component {
         this.setState({
             events: nextEvents,
         });
-        this.updateParent(nextEvents);
-
     };
 
     static eventStyleGetter(event) {
@@ -178,21 +143,26 @@ class TimeSlots extends Component {
         if (event.oldEvent) {
 
             const oldEventStyle = {
-                backgroundColor: 'rgb(145, 160, 173)',
+                backgroundColor: 'rgb(19, 20, 21)',
                 filter: 'brightness(95%)',
-                opacity: 0.7,
+                opacity: 0.8,
                 border: '1px solid #86929c',
                 pointerEvents: 'none',
             };
             style = {...style, ...oldEventStyle};
+
+            return {
+                style: style
+            };
         }
 
         if (!event.slotAvailable) {
             style.backgroundColor = '#FF3333';
+
+            return {
+                style: style
+            };
         }
-        return {
-            style: style
-        };
     }
 
     render() {
